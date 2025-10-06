@@ -16,7 +16,23 @@ const mapTextNodes = (children) => {
   );
 };
 
-const hFraggment = (vNodes) => {
+const extractChildren = (vdom) => {
+  if (vdom.children == null) {
+    return [];
+  }
+
+  const children = [];
+
+  for (const child of vdom.children) {
+    if (child.type === DOM_TYPES.FRAGMENT) {
+      children.push(...extractChildren(child, children)); //TODO: Error function?
+    } else {
+      children.push(child);
+    }
+  }
+};
+
+const hFragment = (vNodes) => {
   return {
     type: DOM_TYPES.FRAGMENT,
     children: mapTextNodes(withoutNulls(vNodes)),
@@ -35,8 +51,9 @@ const h = (tag, props = {}, children = []) => {
 module.exports = {
   DOM_TYPES,
   hstring,
-  hFraggment,
+  hFragment,
   h,
+  extractChildren,
 };
 
 /*const example = h("form", { class: "login-form", action: "login" }, [

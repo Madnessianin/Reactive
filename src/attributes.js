@@ -53,4 +53,7 @@ const setAttributes = (el, attrs) => {
 
 module.exports = {
   setAttributes,
+  removeAttribute,
+  removeStyle,
+  setStyle,
 };

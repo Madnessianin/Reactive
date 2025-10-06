@@ -169,6 +169,7 @@ const arraysDiffSequence = (
 };
 
 module.exports = {
+  ARRAY_DIFF_OP,
   withoutNulls,
   arraysDiff,
   arraysDiffSequence,
