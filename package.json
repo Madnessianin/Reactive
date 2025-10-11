@@ -1,0 +1,22 @@
+{
+  "name": "framive",
+  "version": "1.0.0",
+  "description": "frontend-framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Madnessianin/framive.git"
+  },
+  "keywords": [
+    "frontend"
+  ],
+  "author": "madnessianin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Madnessianin/framive/issues"
+  },
+  "homepage": "https://github.com/Madnessianin/framive#readme"
+}
