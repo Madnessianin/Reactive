@@ -84,7 +84,7 @@ const patchEvents = (el, oldListeners = {}, oldEvents = {}, newEvents = {}) => {
   return addedListeners;
 };
 
-const patchChildren = (oldVdom, newVdom) => {
+const patchChildren = (oldVdom, newVdom, hostComponent) => {
   const oldChildren = extractChildren(oldVdom);
   const newChildren = extractChildren(newVdom);
   const parentEl = oldVdom.el;
@@ -93,10 +93,10 @@ const patchChildren = (oldVdom, newVdom) => {
 
   for (const operation of diffSeq) {
     const { originalIdx, idx, item, op } = operation;
-
+    const offset = hostComponent?.offset ?? 0;
     switch (op) {
       case ARRAY_DIFF_OP.ADD: {
-        mountDOM(item, parentEl, idx);
+        mountDOM(item, parentEl, idx + offset, hostComponent);
         break;
       }
       case ARRAY_DIFF_OP.REMOVE: {
@@ -107,15 +107,20 @@ const patchChildren = (oldVdom, newVdom) => {
         const oldChild = oldChildren[originalIdx];
         const newChild = newChildren[idx];
         const el = oldChild.el;
-        const elAtTargetIndex = parentEl.childNodes[idx];
+        const elAtTargetIndex = parentEl.childNodes[idx + offset];
 
         parentEl.inserBefore(el, elAtTargetIndex);
-        patchDOM(oldChild, newChild, parentEl);
+        patchDOM(oldChild, newChild, parentEl, hostComponent);
 
         break;
       }
       case ARRAY_DIFF_OP.NOOP: {
-        patchDOM(oldChildren[originalIdx], newChildren[idx], parentEl);
+        patchDOM(
+          oldChildren[originalIdx],
+          newChildren[idx],
+          parentEl,
+          hostComponent
+        );
         break;
       }
       default: {
@@ -161,7 +166,7 @@ const patchElement = (oldVdom, newVdom) => {
   return newVdom;
 };
 
-const patchDOM = (oldVdom, newVdom, parentEl) => {
+const patchDOM = (oldVdom, newVdom, parentEl, hostComponent = null) => {
   if (!areNodesEqual(oldVdom, newVdom)) {
     const idx = findIdxInParent(parentEl, oldVdom.el);
     destroyDOM(oldVdom);
@@ -180,6 +185,8 @@ const patchDOM = (oldVdom, newVdom, parentEl) => {
       break;
     }
   }
+
+  patchChildren(oldVdom, newVdom, hostComponent);
 
   return newVdom;
 };
