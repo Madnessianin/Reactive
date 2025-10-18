@@ -5,7 +5,7 @@ const {
   setStyle,
 } = require("./attributes");
 const { destroyDOM } = require("./destroy-dom");
-const { addEventListeners } = require("./events");
+const { addEventListener } = require("./events");
 const { DOM_TYPES, extractChildren } = require("./h");
 const { mountDOM } = require("./mount-dom");
 const { areNodesEqual } = require("./nodes-equal");
@@ -67,7 +67,13 @@ const patchStyles = (el, oldStyle = {}, newStyle = {}) => {
   }
 };
 
-const patchEvents = (el, oldListeners = {}, oldEvents = {}, newEvents = {}) => {
+const patchEvents = (
+  el,
+  oldListeners = {},
+  oldEvents = {},
+  newEvents = {},
+  hostComponent
+) => {
   const { added, removed, updated } = objectsDiff(oldEvents, newEvents);
 
   for (const eventName of removed.concat(updated)) {
@@ -77,7 +83,12 @@ const patchEvents = (el, oldListeners = {}, oldEvents = {}, newEvents = {}) => {
   const addedListeners = {};
 
   for (const eventName of added.concat(updated)) {
-    const listener = addEventListeners(eventName, newEvents[eventName], el);
+    const listener = addEventListener(
+      eventName,
+      newEvents[eventName],
+      el,
+      hostComponent
+    );
     addedListeners[eventName] = listener;
   }
 
@@ -140,7 +151,7 @@ const patchText = (oldVdom, newVdom) => {
   }
 };
 
-const patchElement = (oldVdom, newVdom) => {
+const patchElement = (oldVdom, newVdom, hostComponent) => {
   const el = oldVdom.el;
   const {
     class: oldClass,
@@ -159,7 +170,13 @@ const patchElement = (oldVdom, newVdom) => {
   patchAttrs(el, oldAttrs, newAttrs);
   patchClasses(el, oldClass, newClass);
   patchStyles(el, oldStyle, newStyle);
-  newVdom.listeners = patchEvents(el, oldListeners, oldEvents, newEvents);
+  newVdom.listeners = patchEvents(
+    el,
+    oldListeners,
+    oldEvents,
+    newEvents,
+    hostComponent
+  );
 
   patchChildren(oldVdom, newVdom);
 
@@ -170,7 +187,7 @@ const patchDOM = (oldVdom, newVdom, parentEl, hostComponent = null) => {
   if (!areNodesEqual(oldVdom, newVdom)) {
     const idx = findIdxInParent(parentEl, oldVdom.el);
     destroyDOM(oldVdom);
-    mountDOM(newVdom, parentEl, idx);
+    mountDOM(newVdom, parentEl, idx, hostComponent);
   }
 
   newVdom.el = oldVdom.el;
@@ -181,7 +198,7 @@ const patchDOM = (oldVdom, newVdom, parentEl, hostComponent = null) => {
       return newVdom;
     }
     case DOM_TYPES.ELEMENT: {
-      patchElement(oldVdom, newVdom);
+      patchElement(oldVdom, newVdom, hostComponent);
       break;
     }
   }

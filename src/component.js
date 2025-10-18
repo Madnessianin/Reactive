@@ -2,8 +2,9 @@ const { mountDOM } = require("./mount-dom");
 const { destroyDOM } = require("./destroy-dom");
 const { patchDOM } = require("./patch-dom");
 const { DOM_TYPES, extractChildren } = require("./h");
+const { hasOwnProperty } = require("./utils/objects");
 
-const defineComponrnt = ({ render, state }) => {
+const defineComponrnt = ({ render, state, ...methods }) => {
   class Component {
     #vdom = null;
     #hostEl = null;
@@ -52,7 +53,7 @@ const defineComponrnt = ({ render, state }) => {
         throw new Error("Component is already mounted");
       }
       this.#vdom = this.render();
-      mountDOM(this.#vdom, hostEl, idx);
+      mountDOM(this.#vdom, hostEl, idx, this);
       this.#hostEl = hostEl;
       this.#isMounted = true;
     }
@@ -75,6 +76,16 @@ const defineComponrnt = ({ render, state }) => {
       const vdom = this.render();
       this.#vdom = patchDOM(this.#vdom, vdom, this.#hostEl, this);
     }
+  }
+
+  for (const methodName in methods) {
+    if (hasOwnProperty(Component, methodName)) {
+      throw new Error(
+        `Method "${methodName}()" already exist in the component`
+      );
+    }
+
+    Component.prototype[methodName] = methods[methodName];
   }
 
   return Component;

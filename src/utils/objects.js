@@ -1,3 +1,6 @@
+const hasOwnProperty = (obj, prop) =>
+  Object.prototype.hasOwnProperty.call(obj, prop);
+
 const objectsDiff = (oldObj, newObj) => {
   const oldKeys = Object.keys(oldObj);
   const newKeys = Object.keys(newObj);
@@ -13,4 +16,5 @@ const objectsDiff = (oldObj, newObj) => {
 
 module.exports = {
   objectsDiff,
+  hasOwnProperty,
 };

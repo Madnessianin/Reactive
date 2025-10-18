@@ -28,45 +28,45 @@ const createTextNode = (vdom, parentEl, idx) => {
   insert(textNode, parentEl, idx);
 };
 
-const createFragmentNodes = (vdom, parentEl, idx) => {
+const createFragmentNodes = (vdom, parentEl, idx, hostComponent) => {
   const { children } = vdom;
 
   vdom.el = parentEl;
   children.forEach((child, i) =>
-    mountDOM(child, parentEl, idx ? idx + i : null)
+    mountDOM(child, parentEl, idx ? idx + i : null, hostComponent)
   );
 };
 
-const addProps = (el, props, vdom) => {
+const addProps = (el, props, vdom, hostComponent) => {
   const { on: events, ...attrs } = props;
 
-  vdom.listeners = addEventListeners(events, el);
+  vdom.listeners = addEventListeners(events, el, hostComponent);
   setAttributes(el, attrs);
 };
 
-const createElementNode = (vdom, parentEl, idx) => {
+const createElementNode = (vdom, parentEl, idx, hostComponent) => {
   const { tag, props, children } = vdom;
 
   const element = document.createElement(tag);
-  addProps(element, props, vdom);
+  addProps(element, props, vdom, hostComponent);
   vdom.el = element;
 
-  children.forEach((child) => mountDOM(child, element));
+  children.forEach((child) => mountDOM(child, element, null, hostComponent));
   insert(element, parentEl, idx);
 };
 
-const mountDOM = (vdom, parentEl, idx) => {
+const mountDOM = (vdom, parentEl, idx, hostComponent = null) => {
   switch (vdom.type) {
     case DOM_TYPES.TEXT: {
       createTextNode(vdom, parentEl, idx);
       break;
     }
     case DOM_TYPES.ELEMENT: {
-      createElementNode(vdom, parentEl, idx);
+      createElementNode(vdom, parentEl, idx, hostComponent);
       break;
     }
     case DOM_TYPES.FRAGMENT: {
-      createFragmentNodes(vdom, parentEl, idx);
+      createFragmentNodes(vdom, parentEl, idx, hostComponent);
       break;
     }
     default: {
