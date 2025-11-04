@@ -1,4 +1,5 @@
 const { DOM_TYPES, h } = require("./h");
+const { extractPropsAndEvents } = require("./utils/props");
 
 const insert = (el, parentEl, idx) => {
   if (idx == null) {
@@ -55,6 +56,16 @@ const createElementNode = (vdom, parentEl, idx, hostComponent) => {
   insert(element, parentEl, idx);
 };
 
+const createComponentNode = (vdom, parentEl, idx, hostComponent) => {
+  const Component = vdom.tag;
+  const { props, events } = extractPropsAndEvents(vdom);
+  const component = new Component(props, events, hostComponent);
+
+  component.mount(parentEl, idx);
+  vdom.component = component;
+  vdom.el = component.firstElement;
+};
+
 const mountDOM = (vdom, parentEl, idx, hostComponent = null) => {
   switch (vdom.type) {
     case DOM_TYPES.TEXT: {
@@ -67,6 +78,10 @@ const mountDOM = (vdom, parentEl, idx, hostComponent = null) => {
     }
     case DOM_TYPES.FRAGMENT: {
       createFragmentNodes(vdom, parentEl, idx, hostComponent);
+      break;
+    }
+    case DOM_TYPES.COMPONENT: {
+      createComponentNode(vdom, parentEl, idx, hostComponent);
       break;
     }
     default: {

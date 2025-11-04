@@ -15,6 +15,7 @@ const {
   ARRAY_DIFF_OP,
 } = require("./utils/arrays");
 const { objectsDiff } = require("./utils/objects");
+const { extractPropsAndEvents } = require("./utils/props");
 const { isNotBlankOrEmptyString } = require("./utils/strings");
 
 const findIdxInParent = (parentEl, el) => {
@@ -183,6 +184,16 @@ const patchElement = (oldVdom, newVdom, hostComponent) => {
   return newVdom;
 };
 
+const patchComponent = (oldVdom, newVdom) => {
+  const { component } = oldVdom;
+  const { props } = extractPropsAndEvents(newVdom);
+
+  component.updateProps(props);
+
+  newVdom.component = component;
+  newVdom.el = component.firstElement;
+};
+
 const patchDOM = (oldVdom, newVdom, parentEl, hostComponent = null) => {
   if (!areNodesEqual(oldVdom, newVdom)) {
     const idx = findIdxInParent(parentEl, oldVdom.el);
@@ -199,6 +210,10 @@ const patchDOM = (oldVdom, newVdom, parentEl, hostComponent = null) => {
     }
     case DOM_TYPES.ELEMENT: {
       patchElement(oldVdom, newVdom, hostComponent);
+      break;
+    }
+    case DOM_TYPES.COMPONENT: {
+      patchComponent(oldVdom, newVdom);
       break;
     }
   }
