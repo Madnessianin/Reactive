@@ -1,4 +1,5 @@
 const { DOM_TYPES, h } = require("./h");
+const { enqueueJob } = require("./scheduler");
 const { extractPropsAndEvents } = require("./utils/props");
 
 const insert = (el, parentEl, idx) => {
@@ -82,6 +83,7 @@ const mountDOM = (vdom, parentEl, idx, hostComponent = null) => {
     }
     case DOM_TYPES.COMPONENT: {
       createComponentNode(vdom, parentEl, idx, hostComponent);
+      enqueueJob(() => vdom.component.onMounted());
       break;
     }
     default: {

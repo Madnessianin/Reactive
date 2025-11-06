@@ -6,7 +6,15 @@ const { hasOwnProperty } = require("./utils/objects");
 const { Dispatcher } = require("./dispatcher");
 const equal = require("fast-deep-equal");
 
-const defineComponrnt = ({ render, state, ...methods }) => {
+const emptyFn = () => {};
+
+const defineComponrnt = ({
+  render,
+  state,
+  onMounted = emptyFn,
+  onUnmounted = emptyFn,
+  ...methods
+}) => {
   class Component {
     #vdom = null;
     #hostEl = null;
@@ -21,6 +29,14 @@ const defineComponrnt = ({ render, state, ...methods }) => {
       this.state = state ? state(props) : {};
       this.#eventHandlers = eventHandles;
       this.#parentComponent = parentComponenet;
+    }
+
+    onMounted() {
+      return Promise.resolve(onMounted.call(this));
+    }
+
+    onUnmounted() {
+      return Promise.resolve(onUnmounted.call(this));
     }
 
     get elements() {

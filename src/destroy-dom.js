@@ -41,6 +41,7 @@ const destroyDOM = (vdom) => {
     }
     case DOM_TYPES.COMPONENT: {
       vdom.component.unmount();
+      enqueueJob(() => vdom.component.onUnmounted());
       break;
     }
     default: {
