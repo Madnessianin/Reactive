@@ -30,6 +30,16 @@ const enqueueJob = (job) => {
   scheduleUpdate();
 };
 
+const flushPromises = () => {
+  return new Promise((resolve) => setTimeout(resolve));
+};
+
+const nextTick = () => {
+  scheduleUpdate();
+  return flushPromises();
+};
+
 module.exports = {
   enqueueJob,
+  nextTick,
 };
