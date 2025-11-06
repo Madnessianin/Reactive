@@ -7,13 +7,13 @@ const DOM_TYPES = {
   COMPONENT: "component",
 };
 
-const hstring = (str) => {
+const hString = (str) => {
   return { type: DOM_TYPES.TEXT, value: str };
 };
 
 const mapTextNodes = (children) => {
   return children.map((child) =>
-    typeof child === "string" ? hstring(child) : child
+    typeof child === "string" ? hString(child) : child
   );
 };
 
@@ -53,7 +53,7 @@ const h = (tag, props = {}, children = []) => {
 
 module.exports = {
   DOM_TYPES,
-  hstring,
+  hString,
   hFragment,
   h,
   extractChildren,
